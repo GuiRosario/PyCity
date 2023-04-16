@@ -16,7 +16,7 @@ class Car:
         # define rect for placing the rectangle at the desired position  
         self.car = self.image.get_rect()
 
-        self.velocity = 2
+        self.velocity = 200
         self.direction = 0
         self.wheel = 0
 
@@ -29,14 +29,17 @@ class Car:
 
     def acelerate(self):
         self.direction += self.wheel
-        self.x += self.velocity * math.cos(math.radians(self.direction))
-        self.y += self.velocity * math.sin(math.radians(self.direction))
+        self.x += (self.velocity/100) * math.cos(math.radians(self.direction))
+        self.y += (self.velocity/100) * math.sin(math.radians(self.direction))
         self.wheel = 0
+        if self.velocity < 1000:
+            self.velocity += 20
 
     def desacelerate(self):
+        self.velocity = 200
         self.direction -= self.wheel
-        self.x -= self.velocity * math.cos(math.radians(self.direction))
-        self.y -= self.velocity * math.sin(math.radians(self.direction))
+        self.x -= (self.velocity/100) * math.cos(math.radians(self.direction))
+        self.y -= (self.velocity/100) * math.sin(math.radians(self.direction))
         self.wheel = 0
 
     def turnleft(self):
@@ -46,6 +49,8 @@ class Car:
         self.wheel = -1
 
     def draw(self, screen):
+        if self.velocity > 200:
+            self.velocity -= 10
         self.car.center = (self.y, self.x)
         screen.blit(self.image, self.car)
         car_old_center = self.car.center
