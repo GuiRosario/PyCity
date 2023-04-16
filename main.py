@@ -1,6 +1,6 @@
 import pygame as py  
 import math
-from config import WIDTH, HEIGHT, FPS, BLACK, GREEN, ROT, VEL
+from config import WIDTH, HEIGHT, FPS, BLACK, GREEN , FONT, MAXVELOCITY, MINVELOCITY, CONVERSIONTAX
 
 class Car:
     def __init__(self, x, y):
@@ -15,9 +15,8 @@ class Car:
         self.image.set_colorkey(BLACK)  
         # define rect for placing the rectangle at the desired position  
         self.car = self.image.get_rect()
-
-        self.velocity = 200
-        self.direction = 0
+        self.velocity = 0
+        self.direction = 180
         self.wheel = 0
 
         self.image = py.transform.rotate(self.image_orig, self.direction)
@@ -27,30 +26,49 @@ class Car:
         self.x = x
         self.y = y
 
+    def velocity(self):
+        return self.velocity
+
     def acelerate(self):
         self.direction += self.wheel
-        self.x += (self.velocity/100) * math.cos(math.radians(self.direction))
-        self.y += (self.velocity/100) * math.sin(math.radians(self.direction))
+        self.x += (self.velocity/CONVERSIONTAX) * math.cos(math.radians(self.direction))
+        self.y += (self.velocity/CONVERSIONTAX) * math.sin(math.radians(self.direction))
         self.wheel = 0
-        if self.velocity < 1000:
-            self.velocity += 20
+        if self.velocity < MAXVELOCITY:
+            self.velocity += 10
+            if self.velocity > MAXVELOCITY:
+                self.velocity = MAXVELOCITY
 
     def desacelerate(self):
-        self.velocity = 200
+        if self.velocity > MINVELOCITY:
+            self.velocity -= 10
+            if self.velocity < MINVELOCITY:
+                self.velocity = MINVELOCITY
         self.direction -= self.wheel
-        self.x -= (self.velocity/100) * math.cos(math.radians(self.direction))
-        self.y -= (self.velocity/100) * math.sin(math.radians(self.direction))
+        self.x += (self.velocity/CONVERSIONTAX) * math.cos(math.radians(self.direction))
+        self.y += (self.velocity/CONVERSIONTAX) * math.sin(math.radians(self.direction))
         self.wheel = 0
-
+        
     def turnleft(self):
-        self.wheel = 1
+        self.wheel = 2
 
     def turnright(self):
-        self.wheel = -1
+        self.wheel = -2
 
     def draw(self, screen):
-        if self.velocity > 200:
-            self.velocity -= 10
+        #Decreasing the velocity pear inercia and drag
+        if self.velocity != 0:
+            if self.velocity > 0:
+                self.velocity -= 5
+                if self.velocity < 0:
+                    self.velocity = 0
+            else:
+                self.velocity += 5
+                if self.velocity > 0:
+                    self.velocity = 0
+            self.x += (self.velocity/CONVERSIONTAX) * math.cos(math.radians(self.direction))
+            self.y += (self.velocity/CONVERSIONTAX) * math.sin(math.radians(self.direction))
+
         self.car.center = (self.y, self.x)
         screen.blit(self.image, self.car)
         car_old_center = self.car.center
@@ -63,7 +81,7 @@ def main():
     # for setting FPS  
     clock = py.time.Clock() 
 
-    car = Car(WIDTH/2, HEIGHT/2)
+    car = Car(HEIGHT/2, WIDTH/2)
 
     running = True
     while running:
@@ -89,15 +107,19 @@ def main():
 
         clock.tick(FPS)   
         screen.fill(BLACK)  
+        
         # new_image = py.transform.rotate(image_orig ,ROT)  
         #rect = new_image.get_rect()  
         #rect.center = old_center
-   
+
+        #Print the car velocity on the screen
+        velocity_text = FONT.render("velocity:" + str(car.velocity), True, (200,0,0))
+        screen.blit(velocity_text,(0,0))
+        py.draw.rect(screen,(105,105,105),(490,0,150,900))
         car.draw(screen)
         py.display.flip()  
 
     py.quit()  
-
 
 if __name__ == '__main__':
     main()

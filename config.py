@@ -1,11 +1,15 @@
+import pygame as py
 
-WIDTH = 500  
-HEIGHT = 500  
+py.font.init()
+FONT  = py.font.Font('freesansbold.ttf', 32)
+
+WIDTH = 1200
+HEIGHT = 720  
 FPS = 30
 
 BLACK = (0 , 0 , 0)  
 GREEN = (0 , 255 , 0)  
 
-ROT = 90
-
-VEL = 2
+MAXVELOCITY = 200
+MINVELOCITY = -40
+CONVERSIONTAX = 50
