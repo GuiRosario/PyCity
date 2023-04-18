@@ -4,6 +4,8 @@ from config import WIDTH, HEIGHT, FPS, BLACK, GREEN , FONT, MAXVELOCITY, MINVELO
 
 class Car:
     def __init__(self, x, y):
+        self.cameray = 0
+        self.camerax = 0
         # define a surface (RECTANGLE)  
         self.image_orig = py.Surface((50 , 100))  
         # for making transparent background while ROTating an image  
@@ -28,6 +30,9 @@ class Car:
 
     def velocity(self):
         return self.velocity
+
+    def camera(self):
+        return [self.cameray,self.camerax]
 
     def acelerate(self):
         self.direction += self.wheel
@@ -56,6 +61,9 @@ class Car:
         self.wheel = -2
 
     def draw(self, screen):
+        #Calculating the diference between the middle of the screen and where the car is
+        self.cameray = (self.x - HEIGHT/2)
+        self.camerax = (self.y - WIDTH/2)
         #Decreasing the velocity pear inercia and drag
         if self.velocity != 0:
             if self.velocity > 0:
@@ -68,8 +76,7 @@ class Car:
                     self.velocity = 0
             self.x += (self.velocity/CONVERSIONTAX) * math.cos(math.radians(self.direction))
             self.y += (self.velocity/CONVERSIONTAX) * math.sin(math.radians(self.direction))
-
-        self.car.center = (self.y, self.x)
+        self.car.center = (WIDTH/2,HEIGHT/2)
         screen.blit(self.image, self.car)
         car_old_center = self.car.center
         self.image = py.transform.rotate(self.image_orig, self.direction)
@@ -115,7 +122,7 @@ def main():
         #Print the car velocity on the screen
         velocity_text = FONT.render("velocity:" + str(car.velocity), True, (200,0,0))
         screen.blit(velocity_text,(0,0))
-        py.draw.rect(screen,(105,105,105),(490,0,150,900))
+        py.draw.rect(screen,(105,105,105),(490-car.camera()[1],0-car.camera()[0],150,900))
         car.draw(screen)
         py.display.flip()  
 
